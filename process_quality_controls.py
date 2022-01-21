@@ -2,19 +2,25 @@ import pandas as pd
 import numpy as np
 import os
 
-INPUT_DIR = 'answers'
+INPUT_DIR = 'data/intermediate'
 
 ages_expected = {
     'male_29': 'до 29',
+    'female_29': 'до 29',
+    'male_30_49': '30-49',
+    'female_30_49': '30-49',
 }
 
 sexes_expected = {
     'male_29': 'Мужской',
+    'female_29': 'Женский',
+    'male_30_49': 'Мужской',
+    'female_30_49': 'Женский',
 }
 
 
 def control_sex_preference(df):
-    # Map answers to numbers from 0 to 4
+    # Map raw_answers to numbers from 0 to 4
     # 0 - uncertain
     # 1 - full female preference
     # 4 - full male preference
@@ -58,14 +64,19 @@ def control_sex_preference(df):
 
 
 def control_religion(df):
+    # Map raw_answers to numbers from 0 to 4
+    # 0 - uncertain
+    # 1 - no religious preference
+    # 4 - full religious preference
     question_col = 'Согласны ли вы с утверждением: Религия играет важную роль в моей жизни.'
-    question_answers = ['Затрудняюсь ответить', 'Абсолютно не согласнен', 'Скорее не согласен',
-                        'Скорее согласен', 'Абсолютно согласнен']
+    question_answers = ['Затрудняюсь ответить', 'Абсолютно не согласен', 'Скорее не согласен',
+                        'Скорее согласен', 'Абсолютно согласен']
+
     question_answers_to_religion_preference = {k: i for i, k in enumerate(question_answers)}
     religion_preference_question = df[question_col].apply(lambda x: question_answers_to_religion_preference[x])
 
-    range_question_col = '"Насколько вы согласны с утверждением (1 - полностью НЕ согласен, \n10 - полностью согласен)"" / Религия играет важную роль в моей жизни'
-    religion_preference_range = df[range_question_col] // 3 + 1
+    range_question_col = '"Насколько вы согласны с утверждением (1 - полностью НЕ согласен, \n10 - полностью согласен)"" / Религия НЕ играет важную роль в моей жизни'
+    religion_preference_range = 5 - (df[range_question_col] // 3 + 1)
 
     is_uncertain_question = (df[question_col] == 'Затрудняюсь ответить')
 
@@ -84,13 +95,13 @@ def control_religion(df):
 
 def process_controls():
     for entry in os.scandir(INPUT_DIR):
-        if entry.name.endswith('.xlsx'):
+        if entry.name.endswith('.csv'):
             fpath = entry.path
-            group_name = entry.name.replace('.xlsx', '')
+            group_name = entry.name.replace('.csv', '')
             age_expected = ages_expected[group_name]
             sex_expected = sexes_expected[group_name]
 
-            df = pd.read_excel(fpath)
+            df = pd.read_csv(fpath)
             df = df[df['Источник ответов'] == group_name]
 
             sexism_control_df = control_sex_preference(df)
@@ -104,14 +115,14 @@ def process_controls():
             df['failed_control'] = df['failed_sexism_check'] | df['failed_religion_check']
 
             print('Group', group_name)
-            print('Total', df.shape[0])
-            print('Failed sexism check', df['failed_sexism_check'].sum())
-            print('Failed religion check', df['failed_religion_check'].sum())
-            print('Failed any control', df['failed_control'].sum())
-            print('Invalid age', df['invalid_age'].sum())
-            print('Invalid sex', df['invalid_sex'].sum())
-            print('Any issue', (df['invalid_sex'] | df['invalid_age'] | df['failed_control']).sum())
-            df.to_csv(f'processed/{group_name}.csv', index=False)
+            print('\tTotal', df.shape[0])
+            print('\tFailed sexism check', df['failed_sexism_check'].sum())
+            print('\tFailed religion check', df['failed_religion_check'].sum())
+            print('\tFailed any control', df['failed_control'].sum())
+            print('\tInvalid age', df['invalid_age'].sum())
+            print('\tInvalid sex', df['invalid_sex'].sum())
+            print('\tAny issue', (df['invalid_sex'] | df['invalid_age'] | df['failed_control']).sum())
+            df.to_csv(f'data/processed/{group_name}.csv', index=False)
 
 
 if __name__ == '__main__':
