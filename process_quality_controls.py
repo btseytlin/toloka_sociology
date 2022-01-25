@@ -9,6 +9,8 @@ ages_expected = {
     'female_29': 'до 29',
     'male_30_49': '30-49',
     'female_30_49': '30-49',
+    'male_50': 'более 50',
+    'female_50': 'более 50',
 }
 
 sexes_expected = {
@@ -16,6 +18,8 @@ sexes_expected = {
     'female_29': 'Женский',
     'male_30_49': 'Мужской',
     'female_30_49': 'Женский',
+    'male_50': 'Мужской',
+    'female_50': 'Женский',
 }
 
 
@@ -122,6 +126,8 @@ def process_controls():
             print('\tInvalid age', df['invalid_age'].sum())
             print('\tInvalid sex', df['invalid_sex'].sum())
             print('\tAny issue', (df['invalid_sex'] | df['invalid_age'] | df['failed_control']).sum())
+            print('\tPassed controls', df.shape[0] - df['failed_control'].sum(), f"{round(100*(df.shape[0] - df['failed_control'].sum())/df.shape[0], 1)}%")
+
             df.to_csv(f'data/processed/{group_name}.csv', index=False)
 
 
