@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 
-INPUT_DIR = 'data/intermediate'
 
 ages_expected = {
     'male_29': 'до 29',
@@ -97,8 +96,8 @@ def control_religion(df):
     return religion_control_df
 
 
-def process_controls():
-    for entry in os.scandir(INPUT_DIR):
+def process_quality_controls(input_dir_path, output_dir_path):
+    for entry in os.scandir(input_dir_path):
         if entry.name.endswith('.csv'):
             fpath = entry.path
             group_name = entry.name.replace('.csv', '')
@@ -128,8 +127,8 @@ def process_controls():
             print('\tAny issue', (df['invalid_sex'] | df['invalid_age'] | df['failed_control']).sum())
             print('\tPassed controls', df.shape[0] - df['failed_control'].sum(), f"{round(100*(df.shape[0] - df['failed_control'].sum())/df.shape[0], 1)}%")
 
-            df.to_csv(f'data/processed/{group_name}.csv', index=False)
+            df.to_csv(f'{output_dir_path}/{group_name}.csv', index=False)
 
 
 if __name__ == '__main__':
-    process_controls()
+    process_quality_controls('./data/intermediate', './data/processed')

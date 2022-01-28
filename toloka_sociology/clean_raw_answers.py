@@ -38,8 +38,8 @@ def reverse_old_male_29(df):
     df.loc[df['ID'].isin(old_male_29_ids), to_reverse_column] = 11 - df[df['ID'].isin(old_male_29_ids)][to_reverse_column]
 
 
-if __name__ == '__main__':
-    df = pd.read_excel('data/raw_answers/answers.xlsx')
+def clean_raw_answers(input_dir_path, output_dir_path):
+    df = pd.read_excel(f'{input_dir_path}/answers.xlsx')
     question_col = 'Согласны ли вы с утверждением: Религия играет важную роль в моей жизни.'
     df[question_col] = df[question_col].str.replace('согласнен', 'согласен')
 
@@ -50,4 +50,8 @@ if __name__ == '__main__':
         if group not in groups:
             continue
         group_df = df[df['Источник ответов'] == group]
-        df.to_csv(f'data/intermediate/{group}.csv', index=False)
+        group_df.to_csv(f'{output_dir_path}/{group}.csv', index=False)
+
+
+if __name__ == '__main__':
+    clean_raw_answers()
