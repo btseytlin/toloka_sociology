@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def unwanted_neighbor(row):
-    if row == 0:
+    if pd.isnull(row):
         a = 2
     else:
         a = 1
