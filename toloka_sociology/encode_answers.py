@@ -79,6 +79,14 @@ def immigration(value):
     return answer_map[value]
 
 
+def party(value):
+    if value == 'Единая Россия':
+        encoded = 1
+    else:
+        encoded = 0
+    return encoded
+
+
 def encode_answers(input_dir_path, output_dir_path):
     for entry in os.scandir(input_dir_path):
         if entry.name.endswith('.csv'):
@@ -118,6 +126,9 @@ def encode_answers(input_dir_path, output_dir_path):
 
             df['Q130: Immigration policy preference'] = df[
                 'По вашему мнению, какой должна быть иммиграционная политика?'].apply(immigration)
+
+            df['Q223: Which party would you vote for if there were a national election tomorrow'] = df[
+                'За какую партию вы бы проголосовали, если бы выборы были бы завтра?'].apply(party)
 
             column_map = {
                 'Насколько вы согласны с утверждением (1 - полностью НЕ согласен, \n10 - полностью согласен) / Для мужчины оправдано ударить свою жену': 'Q189: Justifiable: For a man to beat his wife',
