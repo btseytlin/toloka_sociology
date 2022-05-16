@@ -90,7 +90,7 @@ def postprocess(input_dir_path, output_dir_path, wvs_excel_path):
     df['source_age'] = df.apply(get_age, axis=1)
     df['source_sex'] = df.apply(get_sex, axis=1)
 
-    df = fix_demographics(df)
+    #df = fix_demographics(df)
 
     df['self_reported_age'] = df.apply(encode_self_reported_age, axis=1)
     df['self_reported_sex'] = df.apply(encode_self_reported_sex, axis=1)
